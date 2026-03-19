@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Birthday Surprise Deluxe</title>
+  <style>
+    :root {
+      --bg1: #120c1c;
+      --bg2: #2a1035;
+      --pink: #ff5fa2;
+      --hotpink: #ff2d7a;
+      --gold: #ffd166;
+      --lavender: #cdb4ff;
+      --white: #ffffff;
+      --glass: rgba(255,255,255,0.12);
+      --glass-border: rgba(255,255,255,0.18);
+      --shadow: 0 20px 50px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--white);
+      background:
+        radial-gradient(circle at top right, rgba(255,95,162,0.18), transparent 25%),
+        radial-gradient(circle at bottom left, rgba(205,180,255,0.14), transparent 25%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    .stars, .hearts, .confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .star, .heart, .confetti-piece {
+      position: absolute;
+      opacity: 0.9;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    .star {
+      width: 3px;
+      height: 3px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(255,255,255,0.8);
+      animation-name: twinkle;
+    }
+
+    .heart {
+      font-size: 18px;
+      animation-name: floatUp;
+      opacity: 0.7;
+    }
+
+    .confetti-piece {
+      width: 10px;
+      height: 18px;
+      background: var(--gold);
+      animation-name: fall;
+      opacity: 0;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { transform: scale(0.8); opacity: 0.4; }
+      50% { transform: scale(1.6); opacity: 1; }
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(120vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.9; }
+      100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-15vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(540deg); opacity: 0.95; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      width: min(1100px, 92vw);
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+
+    .screen {
+      min-height: 100vh;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 24px 16px 56px;
+      position: relative;
+    }
+
+    .screen.active { display: flex; }
+
+    body.bright-mode {
+      animation: brightenBg 1.8s ease forwards;
+    }
+
+    @keyframes brightenBg {
+      0% {
+        background:
+          radial-gradient(circle at top right, rgba(255,95,162,0.18), transparent 25%),
+          radial-gradient(circle at bottom left, rgba(205,180,255,0.14), transparent 25%),
+          linear-gradient(135deg, var(--bg1), var(--bg2));
+        filter: brightness(1);
+      }
+      100% {
+        background:
+          radial-gradient(circle at top right, rgba(255,255,255,0.28), transparent 25%),
+          radial-gradient(circle at bottom left, rgba(255,209,102,0.22), transparent 25%),
+          linear-gradient(135deg, #2f1737, #5c2357);
+        filter: brightness(1.22);
+      }
+    }
+
+    #lightMomentCard.glow-up {
+      box-shadow: 0 0 20px rgba(255,255,255,0.25), 0 0 50px rgba(255,95,162,0.35), 0 0 100px rgba(255,209,102,0.2);
+      transform: scale(1.02);
+      transition: all 1s ease;
+    }
+
+    .glass-card {
+      width: min(900px, 100%);
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    .title {
+      font-size: clamp(2rem, 5vw, 4rem);
+      margin-bottom: 10px;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      color: rgba(255,255,255,0.9);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      max-width: 760px;
+      margin: 0 auto 18px;
+      line-height: 1.7;
+    }
+
+    .glow {
+      color: #fff3f9;
+      text-shadow: 0 0 12px rgba(255,95,162,.7), 0 0 32px rgba(255,95,162,.3);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      padding: 14px 24px;
+      border-radius: 999px;
+      font-size: 1rem;
+      font-weight: 700;
+      transition: 0.25s ease;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, var(--pink), var(--hotpink));
+      color: white;
+    }
+
+    .secondary-btn {
+      background: rgba(255,255,255,0.12);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.16);
+    }
+
+    button:hover {
+      transform: translateY(-3px) scale(1.02);
+    }
+
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(80px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .time-box {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 20px;
+      padding: 18px 10px;
+    }
+
+    .time-box .num {
+      display: block;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      font-weight: 800;
+      color: var(--gold);
+    }
+
+    .time-box .label {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.95rem;
+      opacity: 0.92;
+    }
+
+    .quiz-box {
+      max-width: 760px;
+      margin: 18px auto 0;
+      text-align: left;
+    }
+
+    .question {
+      font-size: 1.25rem;
+      margin-bottom: 14px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .option {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: white;
+      padding: 14px 18px;
+      border-radius: 18px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .option.correct {
+      background: rgba(46, 213, 115, 0.25);
+      border-color: rgba(46,213,115,0.7);
+    }
+
+    .option.wrong {
+      background: rgba(255, 71, 87, 0.22);
+      border-color: rgba(255,71,87,0.7);
+    }
+
+    .quiz-result {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 1.1rem;
+      min-height: 30px;
+    }
+
+    .memory-builder {
+      margin-top: 20px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .memory-uploader {
+      display: grid;
+      gap: 14px;
+      padding: 20px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 24px;
+      text-align: left;
+    }
+
+    .memory-uploader label {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .memory-uploader input,
+    .memory-uploader textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.1);
+      color: var(--white);
+      border-radius: 16px;
+      padding: 14px 16px;
+      font: inherit;
+    }
+
+    .memory-uploader textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .memory-progress {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.82);
+    }
+
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    .memory-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 22px;
+      overflow: hidden;
+      transition: 0.25s ease;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .memory-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .memory-card.empty {
+      justify-content: center;
+      align-items: center;
+      border-style: dashed;
+      color: rgba(255,255,255,0.72);
+      padding: 20px;
+    }
+
+    .memory-card img,
+    .memory-card video {
+      display: block;
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .memory-caption {
+      padding: 12px 14px 16px;
+      font-size: 0.96rem;
+      line-height: 1.6;
+      text-align: left;
+    }
+
+    .memory-caption strong {
+      color: var(--gold);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .memory-status {
+      min-height: 26px;
+      font-size: 0.95rem;
+      color: var(--gold);
+    }
+
+    .timeline {
+      width: min(900px, 100%);
+      margin-top: 18px;
+      display: grid;
+      gap: 14px;
+      text-align: left;
+    }
+
+    .timeline-item {
+      background: rgba(255,255,255,0.08);
+      border-left: 4px solid var(--pink);
+      border-radius: 16px;
+      padding: 14px 16px;
+    }
+
+    .timeline-item strong {
+      color: var(--gold);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    #cakeWrap {
+      margin-top: 10px;
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #cake {
+      font-size: clamp(7rem, 15vw, 10rem);
+      filter: drop-shadow(0 0 22px rgba(255,209,102,0.3));
+      transition: transform .2s ease;
+    }
+
+    #cakeWrap:hover #cake { transform: scale(1.05); }
+
+    .candle-flame {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      opacity: 0;
+      transition: .4s;
+      text-shadow: 0 0 25px orange;
+    }
+
+    .lit .candle-flame { opacity: 1; }
+    .blown .candle-flame { opacity: 0; }
+
+    .balloon-stage {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    .balloon {
+      width: 90px;
+      height: 115px;
+      border-radius: 50% 50% 45% 45%;
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      animation: bob 2.5s ease-in-out infinite;
+      box-shadow: inset -10px -14px 20px rgba(0,0,0,.15), 0 12px 25px rgba(0,0,0,.2);
+    }
+
+    .balloon::after {
+      content: "";
+      position: absolute;
+      bottom: -25px;
+      width: 2px;
+      height: 26px;
+      background: rgba(255,255,255,.7);
+    }
+
+    .balloon:nth-child(odd) { animation-delay: .2s; }
+    .balloon:nth-child(even) { animation-delay: .7s; }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .popped {
+      transform: scale(0);
+      opacity: 0;
+      transition: .35s ease;
+      pointer-events: none;
+    }
+
+    .quote-box {
+      transition: all .35s ease;
+    }
+
+    .lit-candle {
+      box-shadow: 0 0 16px rgba(255,209,102,.7), 0 0 30px rgba(255,159,67,.45);
+      transform: translateY(-6px) scale(1.06) !important;
+      filter: brightness(1.2);
+    }
+
+    .cake-cut {
+      transform: translateX(-50%) scale(0.96) rotate(-4deg) !important;
+      opacity: 0.92;
+      filter: drop-shadow(0 0 24px rgba(255, 209, 102, 0.45));
+    }
+
+    .knife-cut {
+      transform: translate(-135px, 128px) rotate(-38deg) scale(1.08) !important;
+    }
+
+    .cutting-area {
+      position: relative;
+      margin: 26px auto 0;
+      width: min(520px, 95%);
+      height: 280px;
+    }
+
+    .knife {
+      position: absolute;
+      right: 20px;
+      top: 10px;
+      font-size: 4rem;
+      cursor: pointer;
+      transition: all .8s ease;
+      user-select: none;
+      z-index: 3;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,.28));
+    }
+
+    .cake-hero {
+      position: absolute;
+      left: 50%;
+      top: 90px;
+      transform: translateX(-50%);
+      font-size: 8rem;
+      transition: all .8s ease;
+      filter: drop-shadow(0 0 18px rgba(255,209,102,.35));
+      cursor: pointer;
+      z-index: 1;
+      user-select: none;
+    }
+
+    .cut-spark {
+      position: absolute;
+      left: 50%;
+      top: 76px;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      z-index: 2;
+    }
+
+    .cake-slice-line {
+      position: absolute;
+      left: 50%;
+      top: 116px;
+      width: 12px;
+      height: 120px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,95,162,0.15));
+      transform: translateX(-50%) scaleY(0);
+      transform-origin: top;
+      transition: transform .65s ease;
+      box-shadow: 0 0 18px rgba(255,255,255,.35);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .cake-slice-line.active {
+      transform: translateX(-50%) scaleY(1);
+    }
+
+    .story-book {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      min-height: 320px;
+    }
+
+    .story-page {
+      padding: 28px;
+      text-align: left;
+    }
+
+    .story-page.left {
+      border-right: 1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+    }
+
+    .story-page.right {
+      background: linear-gradient(180deg, rgba(255,95,162,0.16), rgba(205,180,255,0.08));
+    }
+
+    .story-label {
+      font-size: 0.88rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.72);
+    }
+
+    .quote-box {
+      margin-top: 20px;
+      background: rgba(255,255,255,0.09);
+      border-radius: 22px;
+      padding: 22px;
+      border: 1px solid rgba(255,255,255,0.14);
+      line-height: 1.8;
+      font-size: 1.1rem;
+    }
+
+    .final-message {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      line-height: 1.9;
+      max-width: 760px;
+      margin: 14px auto 0;
+      color: rgba(255,255,255,0.95);
+    }
+
+    .name-highlight {
+      color: var(--gold);
+      font-weight: 800;
+    }
+
+    .small-note {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      opacity: 0.8;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 900px) {
+      .memory-grid { grid-template-columns: 1fr; }
+      .options { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .memory-grid,
+      .countdown-grid { grid-template-columns: 1fr; }
+      .glass-card { padding: 22px 16px; }
+      .balloon { width: 78px; height: 100px; }
+      .knife { right: 2px; font-size: 3.4rem; }
+      .cake-hero { font-size: 6.5rem; top: 100px; }
+      .story-book { grid-template-columns: 1fr; }
+      .story-page.left { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.12); }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  <div class="hearts" id="hearts"></div>
+  <div class="confetti" id="confetti"></div>
+
+  <div class="container">
+    <section id="screen1" class="screen active">
+      <div class="glass-card">
+        <h1 class="title glow">A Little Surprise For <span class="name-highlight">Your Cutiepie</span> 💖</h1>
+        <p class="subtitle">
+          Countdown se shuruaat, phir ek cute quiz, uske baad pichhle saal ki memories,
+          aur end mein cake, balloons, quotes aur ek pyara sa birthday message.
+        </p>
+
+        <h2>Birthday Countdown ⏳</h2>
+        <p class="small-note">Apni birthday date niche <code>targetDate</code> mein set kar dena.</p>
+        <div class="countdown-grid">
+          <div class="time-box"><span class="num" id="days">00</span><span class="label">Days</span></div>
+          <div class="time-box"><span class="num" id="hours">00</span><span class="label">Hours</span></div>
+          <div class="time-box"><span class="num" id="minutes">00</span><span class="label">Minutes</span></div>
+          <div class="time-box"><span class="num" id="seconds">00</span><span class="label">Seconds</span></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="primary-btn" onclick="nextStep(2)">Start the Surprise ✨</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen2" class="screen">
+      <div class="glass-card">
+        <h1 class="title">Cute Quiz Time 💌</h1>
+        <p class="subtitle">Har sahi answer ke saath surprise aur special hota jayega.</p>
+
+        <div class="quiz-box">
+          <div class="question" id="questionText"></div>
+          <div class="options" id="optionsWrap"></div>
+          <div class="quiz-result" id="quizResult"></div>
+          <div class="btn-row">
+            <button class="secondary-btn hidden" id="nextQuestionBtn" onclick="nextQuizQuestion()">Next Question ➜</button>
+            <button class="primary-btn hidden" id="toMemoriesBtn" onclick="nextStep(3)">Unlock Memories 📸</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen3" class="screen">
+      <div class="glass-card">
+        <h1 class="title glow">Our Sweet Memories 📸🎥</h1>
+        <p class="subtitle">Yahan 5 photos ya videos one by one add karo, aur har memory ke saath apna quote bhi likho.</p>
+
+        <div class="memory-builder">
+          <div class="memory-uploader">
+            <div class="memory-progress" id="memoryProgress">0 / 5 memories added</div>
+            <label for="memoryUrlInput">Paste image or video URL</label>
+            <input id="memoryUrlInput" type="url" placeholder="https://raw.githubusercontent.com/username/repo/main/photo1.jpg">
+            <label for="memoryQuoteInput">Write a quote for this memory</label>
+            <textarea id="memoryQuoteInput" placeholder="Example: Is din tumhari smile ne pura din beautiful bana diya."></textarea>
+            <div class="btn-row" style="justify-content:flex-start; margin-top:0;">
+              <button class="primary-btn" id="addMemoryBtn" onclick="addMemoryItem()">Add This Memory 💖</button>
+            </div>
+            <div class="memory-status" id="memoryStatus">Pehli memory se shuruaat karo.</div>
+          </div>
+
+          <div class="memory-grid" id="memoryGrid"></div>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-item">
+            <strong>From Small Moments 💫</strong>
+            Har chhoti baat, har hansi, har call… sab yaadgar bana diya tumne.
+          </div>
+          <div class="timeline-item">
+            <strong>To Bigger Memories 🌸</strong>
+            Saath mein bitaya hua time simple tha, but tumhari wajah se special ban gaya.
+          </div>
+          <div class="timeline-item">
+            <strong>And Now This Birthday 🎂</strong>
+            Pichhle birthdays ki yaadon ke baad, ab naye memories likhne ka time hai.
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="primary-btn hidden" id="memoryNextBtn" onclick="nextStep(35)">Open The Next Chapter 📖</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen35" class="screen">
+      <div class="glass-card">
+        <h1 class="title glow">These Were The Previous Birthdays 💫</h1>
+        <p class="subtitle">Now it is time to create new memories, new smiles, and another year full of love.</p>
+
+        <div class="quote-box" style="padding:0; overflow:hidden;">
+          <div class="story-book">
+            <div class="story-page left">
+              <div class="story-label">Chapter One</div>
+              <h2 style="margin:14px 0 10px; color:var(--gold);">A Birthday Story</h2>
+              <p style="line-height:1.9; margin:0;">Cutie pie was born 26 years ago, and the world quietly became softer, prettier, and brighter from that day onward.</p>
+            </div>
+            <div class="story-page right">
+              <div class="story-label">Chapter Two</div>
+              <h2 style="margin:14px 0 10px; color:var(--gold);">For Your Cutie Pie</h2>
+              <p style="line-height:1.9; margin:0;">So happy birthday, cutie pie. The next pages are waiting for more laughter, more photos, more late-night talks, and more beautiful memories with you.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="primary-btn" onclick="nextStep(4)">Continue To Cake Surprise 🎂</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen4" class="screen">
+      <div class="glass-card">
+        <h1 class="title">Tap to Light the Candle ✨</h1>
+        <p class="subtitle">Pehle candle light karo, phir blow karke next birthday surprise kholo 💖</p>
+
+        <div id="cakeWrap" onclick="lightCandle()">
+          <div class="candle-flame">🔥</div>
+          <div id="cake">🎂</div>
+        </div>
+
+        <p id="cakeNote" class="small-note">Touch the cake to light the candle 💖</p>
+
+        <div class="btn-row">
+          <button class="secondary-btn hidden" id="blowBtn" onclick="blowCandle()">Blow the Candle 💨</button>
+          <button class="primary-btn hidden" id="cakeNextBtn" onclick="nextStep(5)">Continue to Birthday Magic 🎈</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen45" class="screen">
+      <div class="glass-card" id="lightMomentCard">
+        <h1 class="title">One More Tap For Magic 🌟</h1>
+        <p class="subtitle">
+          Tap below and let the lights glow a little brighter... then the birthday magic begins. 💫
+        </p>
+
+        <div class="btn-row">
+          <button class="primary-btn" onclick="activateGlowMoment()">Light it up ✨</button>
+        </div>
+
+        <p class="small-note" id="glowNote">A tiny magical moment before your cake appears 💖</p>
+      </div>
+    </section>
+
+    <section id="screen5" class="screen">
+      <div class="glass-card">
+        <h1 class="title glow">Birthday Magic Time 🎈🕯️🎂</h1>
+        <p class="subtitle">Pehle candles, phir balloons, aur uske baad cake cutting with knife... all with music and a dreamy vibe 💖</p>
+
+        <div id="magicStage1">
+          <h2>Light All The Candles 🕯️</h2>
+          <p class="small-note">Har candle ko tap karo aur birthday glow badhao ✨</p>
+          <div class="balloon-stage" id="candleStage" style="gap:22px;">
+            <div class="balloon candle-item" style="background:#ffb347; width:78px; height:95px;" onclick="lightSingleCandle(this)">🕯️</div>
+            <div class="balloon candle-item" style="background:#ffd166; width:78px; height:95px;" onclick="lightSingleCandle(this)">🕯️</div>
+            <div class="balloon candle-item" style="background:#f78fb3; width:78px; height:95px;" onclick="lightSingleCandle(this)">🕯️</div>
+            <div class="balloon candle-item" style="background:#cdb4ff; width:78px; height:95px;" onclick="lightSingleCandle(this)">🕯️</div>
+          </div>
+          <div class="quote-box" id="candleMessage">Light all 4 candles to begin the celebration 💫</div>
+        </div>
+
+        <div id="magicStage2" class="hidden">
+          <h2>Pop the Celebration Balloons 🎈</h2>
+          <p class="small-note">Har balloon ke saath surprise aur pyara hota jayega 💕</p>
+          <div class="balloon-stage" id="celebrationBalloons">
+            <div class="balloon" style="background:#ff5fa2;" onclick="popMagicBalloon(this, 'You')">🎈</div>
+            <div class="balloon" style="background:#2ed573;" onclick="popMagicBalloon(this, 'Make')">🎈</div>
+            <div class="balloon" style="background:#1e90ff;" onclick="popMagicBalloon(this, 'Life')">🎈</div>
+            <div class="balloon" style="background:#ffa502;" onclick="popMagicBalloon(this, 'More')">🎈</div>
+            <div class="balloon" style="background:#a55eea;" onclick="popMagicBalloon(this, 'Beautiful')">🎈</div>
+          </div>
+          <div class="quote-box" id="magicBalloonMessage">Pop them all... 💖</div>
+        </div>
+
+        <div id="magicStage3" class="hidden">
+          <h2>Now Cut The Cake 🎂🔪</h2>
+          <p class="small-note">Knife ya cake dono par tap karo and unlock the sweetest message 💗</p>
+          <div id="cuttingArea" class="cutting-area">
+            <div id="knife" class="knife" onclick="cutCake()">🔪</div>
+            <div id="bigCake" class="cake-hero" onclick="cutCake()">🎂</div>
+            <div id="cutSpark" class="cut-spark hidden">✨💖✨</div>
+            <div id="cakeSliceLine" class="cake-slice-line"></div>
+          </div>
+          <div class="quote-box" id="cakeCutMessage">Tap the knife or the cake to cut it 🎂</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="primary-btn hidden" id="toFinalLoveBtn" onclick="nextStep(6)">Open Love Quote 💌</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen6" class="screen">
+      <div class="glass-card">
+        <h1 class="title glow">Happy Birthday, <span class="name-highlight">Cutiepie</span> 🥳💖</h1>
+        <p class="final-message">
+          Tum meri life ki sabse soft, pyari aur beautiful feeling ho. Tumhare saath har moment thoda aur warm, thoda aur bright, aur bahut zyada special lagta hai. 💖<br><br>
+          Aaj ke din bas itna kehna hai — tum hamesha haste raho, khush raho, aur duniya tumhe utna hi pyaar de jitna tum deserve karti ho... ya usse bhi zyada. ✨
+        </p>
+
+        <div class="quote-box">
+          <b>Love quote for you 💌</b><br><br>
+          “You are the calm in my chaos, the smile in my ordinary days, and the most beautiful part of my heart.”<br><br>
+          “If I could gift you one thing, I would gift you the ability to see yourself through my eyes — then you’d know how incredibly lovable and precious you are.”
+        </div>
+
+        <div class="quote-box" style="margin-top:14px;">
+          No matter how many birthdays come and go, one thing will always stay the same —
+          <b>you will always be one of the most special parts of my world.</b> 🌸
+        </div>
+
+        <div class="btn-row">
+          <button class="primary-btn" onclick="replaySurprise()">Replay Surprise 🔁</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ==============================
+    // PERSONALIZE HERE
+    // ==============================
+    // Format: YYYY-MM-DDTHH:MM:SS
+    const targetDate = "2026-03-25T00:00:00";
+
+    const quizData = [
+      {
+        question: "What is the cutest thing about you?",
+        options: ["Your smile", "Your kindness", "Your eyes", "All of the above"],
+        correct: 3,
+        correctMessage: "Obviously... all of the above. You are unfairly cute. 💖"
+      },
+      {
+        question: "Who deserves the sweetest birthday ever?",
+        options: ["You", "Only you", "Definitely you", "Still you"],
+        correct: 0,
+        correctMessage: "Correct... but honestly every option was right. 🥹"
+      },
+      {
+        question: "What should this year bring for you?",
+        options: ["Happiness", "Love", "Success", "Everything beautiful"],
+        correct: 3,
+        correctMessage: "Yes. Everything beautiful, because you deserve all of it. ✨"
+      }
+    ];
+
+    let currentScreen = 1;
+    let currentQuizIndex = 0;
+    let litDone = false;
+    let candlesLit = 0;
+    let magicBalloonWords = [];
+    let cakeCutDone = false;
+    const maxMemories = 5;
+    const memoryEntries = [];
+    function nextStep(step) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(`screen${step}`).classList.add('active');
+      currentScreen = step;
+      if (step === 2) renderQuiz();
+      if (step === 6) burstConfetti(120);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Countdown
+    function updateCountdown() {
+      const target = new Date(targetDate).getTime();
+      const now = new Date().getTime();
+      const diff = target - now;
+
+      if (diff <= 0) {
+        document.getElementById('days').innerText = '00';
+        document.getElementById('hours').innerText = '00';
+        document.getElementById('minutes').innerText = '00';
+        document.getElementById('seconds').innerText = '00';
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      document.getElementById('days').innerText = String(days).padStart(2, '0');
+      document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+      document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+      document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // Quiz
+    function renderQuiz() {
+      const q = quizData[currentQuizIndex];
+      document.getElementById('questionText').innerText = q.question;
+      document.getElementById('quizResult').innerText = '';
+      document.getElementById('nextQuestionBtn').classList.add('hidden');
+      document.getElementById('toMemoriesBtn').classList.add('hidden');
+
+      const wrap = document.getElementById('optionsWrap');
+      wrap.innerHTML = '';
+
+      q.options.forEach((optionText, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'option';
+        btn.innerText = optionText;
+        btn.onclick = () => handleQuizAnswer(index, btn);
+        wrap.appendChild(btn);
+      });
+    }
+
+    function handleQuizAnswer(selectedIndex, selectedBtn) {
+      const q = quizData[currentQuizIndex];
+      const allOptions = document.querySelectorAll('.option');
+      allOptions.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === q.correct) btn.classList.add('correct');
+      });
+
+      if (selectedIndex !== q.correct) selectedBtn.classList.add('wrong');
+
+      document.getElementById('quizResult').innerText = q.correctMessage;
+
+      if (currentQuizIndex < quizData.length - 1) {
+        document.getElementById('nextQuestionBtn').classList.remove('hidden');
+      } else {
+        document.getElementById('toMemoriesBtn').classList.remove('hidden');
+      }
+    }
+
+    function nextQuizQuestion() {
+      currentQuizIndex++;
+      renderQuiz();
+    }
+
+
+    function renderMemorySlots() {
+      const grid = document.getElementById('memoryGrid');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < maxMemories; i++) {
+        const item = memoryEntries[i];
+        const card = document.createElement('div');
+        card.className = 'memory-card' + (item ? '' : ' empty');
+
+        if (item) {
+          if (item.type.startsWith('video/')) {
+            const video = document.createElement('video');
+            video.controls = true;
+            video.preload = 'metadata';
+            video.src = item.url;
+            card.appendChild(video);
+          } else {
+            const img = document.createElement('img');
+            img.src = item.url;
+            img.alt = `memory ${i + 1}`;
+            card.appendChild(img);
+          }
+
+          const caption = document.createElement('div');
+          caption.className = 'memory-caption';
+          const heading = document.createElement('strong');
+          heading.innerText = `Memory ${i + 1}`;
+          const quoteText = document.createElement('span');
+          quoteText.innerText = item.quote;
+          caption.appendChild(heading);
+          caption.appendChild(quoteText);
+          card.appendChild(caption);
+        } else {
+          card.innerHTML = `<div><strong>Memory ${i + 1}</strong><br>Yeh slot abhi tumhari next photo ya video ka wait kar raha hai.</div>`;
+        }
+
+        grid.appendChild(card);
+      }
+
+      document.getElementById('memoryProgress').innerText = `${memoryEntries.length} / ${maxMemories} memories added`;
+      const done = memoryEntries.length === maxMemories;
+      document.getElementById('memoryNextBtn').classList.toggle('hidden', !done);
+      document.getElementById('addMemoryBtn').disabled = done;
+      document.getElementById('addMemoryBtn').style.opacity = done ? '0.65' : '1';
+      document.getElementById('addMemoryBtn').style.cursor = done ? 'not-allowed' : 'pointer';
+    }
+
+    function addMemoryItem() {
+      if (memoryEntries.length >= maxMemories) return;
+
+      const urlInput = document.getElementById('memoryUrlInput');
+      const quoteInput = document.getElementById('memoryQuoteInput');
+      const mediaUrl = urlInput.value.trim();
+      const quote = quoteInput.value.trim();
+      const status = document.getElementById('memoryStatus');
+
+      if (!mediaUrl) {
+        status.innerText = 'Pehle image ya video ka hosted URL paste karo.';
+        return;
+      }
+
+      if (!quote) {
+        status.innerText = 'Har memory ke saath ek quote bhi likho.';
+        return;
+      }
+
+      try {
+        new URL(mediaUrl);
+      } catch (error) {
+        status.innerText = 'Valid URL paste karo. GitHub raw link best rahega.';
+        return;
+      }
+
+      const normalizedUrl = mediaUrl.toLowerCase();
+      const isVideo = /\.(mp4|webm|ogg|mov)(\?|#|$)/.test(normalizedUrl);
+      const isImage = /\.(jpg|jpeg|png|gif|webp|avif|svg)(\?|#|$)/.test(normalizedUrl);
+
+      if (!isVideo && !isImage) {
+        status.innerText = 'URL image ya video file ka hona chahiye.';
+        return;
+      }
+
+      memoryEntries.push({
+        type: isVideo ? 'video/url' : 'image/url',
+        url: mediaUrl,
+        quote
+      });
+
+      urlInput.value = '';
+      quoteInput.value = '';
+      status.innerText = memoryEntries.length === maxMemories
+        ? 'Perfect. Saari 5 memories ready hain.'
+        : `Memory ${memoryEntries.length} save ho gayi. Ab next one add karo.`;
+
+      renderMemorySlots();
+    }
+
+    // Cake
+    function lightCandle() {
+      if (litDone) return;
+      litDone = true;
+      playMusic();
+      document.getElementById('cakeWrap').classList.add('lit');
+      document.getElementById('cakeNote').innerText = 'Candle jal gayi... ab ek wish maango aur blow karo 💫';
+      document.getElementById('blowBtn').classList.remove('hidden');
+      burstConfetti(35);
+    }
+
+    function blowCandle() {
+      playMusic();
+      playClick();
+      const cakeWrap = document.getElementById('cakeWrap');
+      cakeWrap.classList.add('blown');
+      document.getElementById('cakeNote').innerText = 'Yayyy... candle blow ho gayi! Ab next surprise kholo 🎉';
+      document.getElementById('cakeNextBtn').classList.remove('hidden');
+      burstConfetti(55);
+    }
+
+    function activateGlowMoment() {
+      playMusic();
+      document.body.classList.add('bright-mode');
+      document.getElementById('lightMomentCard').classList.add('glow-up');
+      document.getElementById('glowNote').innerText = 'Look... everything is glowing brighter for you ✨';
+      burstConfetti(70);
+      setTimeout(() => nextStep(4), 1800);
+    }
+
+    // Balloons
+    function lightSingleCandle(el) {
+      if (el.classList.contains('lit-candle')) return;
+      playMusic();
+      playClick();
+      el.classList.add('lit-candle');
+      el.innerText = '🔥';
+      candlesLit++;
+      document.getElementById('candleMessage').innerText = `${candlesLit} / 4 candles lit ✨`;
+      burstConfetti(12);
+
+      if (candlesLit === 4) {
+        document.getElementById('candleMessage').innerHTML = '<b>All candles are glowing now... let’s celebrate with balloons 🎈</b>';
+        setTimeout(() => {
+          document.getElementById('magicStage1').classList.add('hidden');
+          document.getElementById('magicStage2').classList.remove('hidden');
+        }, 1100);
+      }
+    }
+
+    function popMagicBalloon(el, word) {
+      if (el.classList.contains('popped')) return;
+      playMusic();
+      playClick();
+      el.classList.add('popped');
+      magicBalloonWords.push(word);
+      document.getElementById('magicBalloonMessage').innerText = magicBalloonWords.join(' ') + ' 💖';
+
+      if (magicBalloonWords.length === 5) {
+        document.getElementById('magicBalloonMessage').innerHTML = '<b>You Make Life More Beautiful</b> 💕';
+        burstConfetti(70);
+        setTimeout(() => {
+          document.getElementById('magicStage2').classList.add('hidden');
+          document.getElementById('magicStage3').classList.remove('hidden');
+        }, 1000);
+      }
+    }
+
+    function cutCake() {
+      if (cakeCutDone) return;
+      cakeCutDone = true;
+      playMusic();
+      playClick();
+      document.getElementById('knife').classList.add('knife-cut');
+      document.getElementById('bigCake').classList.add('cake-cut');
+      document.getElementById('cutSpark').classList.remove('hidden');
+      document.getElementById('cakeSliceLine').classList.add('active');
+      document.getElementById('cakeCutMessage').innerHTML = '<b>Cake cut ho gaya... sweetest part is waiting for you 💗</b>';
+      burstConfetti(120);
+      setTimeout(() => {
+        document.getElementById('toFinalLoveBtn').classList.remove('hidden');
+      }, 1200);
+    }
+
+    function replaySurprise() {
+      currentQuizIndex = 0;
+      litDone = false;
+      candlesLit = 0;
+      magicBalloonWords = [];
+      cakeCutDone = false;
+
+      memoryEntries.length = 0;
+      document.getElementById('memoryUrlInput').value = '';
+      document.getElementById('memoryQuoteInput').value = '';
+      document.getElementById('memoryStatus').innerText = 'Pehli memory se shuruaat karo.';
+      renderMemorySlots();
+
+      document.querySelectorAll('.balloon').forEach(b => b.classList.remove('popped'));
+      document.querySelectorAll('.candle-item').forEach(c => {
+        c.classList.remove('lit-candle');
+        c.innerText = '🕯️';
+      });
+
+      document.getElementById('cakeWrap').classList.remove('lit', 'blown');
+      document.getElementById('blowBtn').classList.add('hidden');
+      document.getElementById('cakeNextBtn').classList.add('hidden');
+      document.getElementById('cakeNote').innerText = 'Touch the cake to light the candle 💖';
+
+      document.body.classList.remove('bright-mode');
+      document.getElementById('lightMomentCard').classList.remove('glow-up');
+      document.getElementById('glowNote').innerText = 'A tiny magical moment before your cake appears 💖';
+
+      document.getElementById('magicStage1').classList.remove('hidden');
+      document.getElementById('magicStage2').classList.add('hidden');
+      document.getElementById('magicStage3').classList.add('hidden');
+      document.getElementById('candleMessage').innerText = 'Light all 4 candles to begin the celebration 💫';
+      document.getElementById('magicBalloonMessage').innerText = 'Pop them all... 💖';
+      document.getElementById('cakeCutMessage').innerText = 'Tap the knife or the cake to cut it 🎂';
+      document.getElementById('toFinalLoveBtn').classList.add('hidden');
+      document.getElementById('knife').classList.remove('knife-cut');
+      document.getElementById('bigCake').classList.remove('cake-cut');
+      document.getElementById('cutSpark').classList.add('hidden');
+      document.getElementById('cakeSliceLine').classList.remove('active');
+
+      nextStep(1);
+    }
+
+    // Effects
+    function createStars() {
+      const stars = document.getElementById('stars');
+      for (let i = 0; i < 90; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        s.style.left = Math.random() * 100 + 'vw';
+        s.style.top = Math.random() * 100 + 'vh';
+        s.style.animationDuration = (1.5 + Math.random() * 3) + 's';
+        s.style.animationDelay = (Math.random() * 3) + 's';
+        stars.appendChild(s);
+      }
+    }
+
+    function createHearts() {
+      const hearts = document.getElementById('hearts');
+      setInterval(() => {
+        const h = document.createElement('div');
+        h.className = 'heart';
+        h.innerText = Math.random() > 0.5 ? '💖' : '💗';
+        h.style.left = Math.random() * 100 + 'vw';
+        h.style.animationDuration = (5 + Math.random() * 4) + 's';
+        h.style.fontSize = (14 + Math.random() * 14) + 'px';
+        hearts.appendChild(h);
+        setTimeout(() => h.remove(), 9000);
+      }, 700);
+    }
+
+    function burstConfetti(count = 60) {
+      const confetti = document.getElementById('confetti');
+      const colors = ['#ffd166', '#ff5fa2', '#cdb4ff', '#2ed573', '#1e90ff', '#ff9f43'];
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.top = (-10 - Math.random() * 20) + 'vh';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.width = (6 + Math.random() * 8) + 'px';
+        piece.style.height = (10 + Math.random() * 14) + 'px';
+        piece.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+        piece.style.animationDelay = (Math.random() * 0.2) + 's';
+        confetti.appendChild(piece);
+        setTimeout(() => piece.remove(), 5000);
+      }
+    }
+
+    renderMemorySlots();
+    createStars();
+    createHearts();
+  </script>
+  <!-- Background Music -->
+  <audio id="bgMusic" loop>
+    <source src="your-music.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Sound Effects -->
+  <audio id="clickSound">
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1e8b.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const bgMusic = document.getElementById('bgMusic');
+    const clickSound = document.getElementById('clickSound');
+
+    function playMusic() {
+      if (bgMusic.paused) {
+        bgMusic.volume = 0.5;
+        bgMusic.play().catch(()=>{});
+      }
+    }
+
+    function playClick() {
+      clickSound.currentTime = 0;
+      clickSound.play();
+    }
+
+    // Modify existing nextStep to include music + sound
+    const originalNextStep = nextStep;
+    nextStep = function(step) {
+      playMusic();
+      playClick();
+      originalNextStep(step);
+    }
+
+    // Add sound to interactions
+    document.addEventListener('click', function(e) {
+      if (e.target.tagName === 'BUTTON' || e.target.classList.contains('balloon')) {
+        playClick();
+      }
+    });
+  </script>
+</body>
+</html>
