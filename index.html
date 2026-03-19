@@ -317,29 +317,18 @@
       color: rgba(255,255,255,0.82);
     }
 
-    .memory-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-      margin-top: 4px;
-    }
-
-    .memory-card {
+    .memory-viewer {
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 22px;
       overflow: hidden;
-      transition: 0.25s ease;
       min-height: 320px;
       display: flex;
       flex-direction: column;
+      margin-top: 4px;
     }
 
-    .memory-card:hover {
-      transform: translateY(-6px);
-    }
-
-    .memory-card.empty {
+    .memory-viewer.empty {
       justify-content: center;
       align-items: center;
       border-style: dashed;
@@ -358,13 +347,13 @@
       background: rgba(255,255,255,0.06);
     }
 
-    .memory-card img,
-    .memory-card video {
+    .memory-viewer img,
+    .memory-viewer video {
       display: block;
       width: auto;
       max-width: 100%;
       height: auto;
-      max-height: 390px;
+      max-height: 52vh;
       object-fit: contain;
       background: rgba(255,255,255,0.08);
       border-radius: 16px;
@@ -387,6 +376,19 @@
       min-height: 26px;
       font-size: 0.95rem;
       color: var(--gold);
+    }
+
+    .memory-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .memory-index {
+      font-size: 0.96rem;
+      color: rgba(255,255,255,0.82);
     }
 
     .timeline {
@@ -626,12 +628,10 @@
     .hidden { display: none !important; }
 
     @media (max-width: 900px) {
-      .memory-grid { grid-template-columns: 1fr; }
       .options { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 600px) {
-      .memory-grid,
       .countdown-grid { grid-template-columns: 1fr; }
       .glass-card { padding: 22px 16px; }
       .balloon { width: 78px; height: 100px; }
@@ -639,6 +639,7 @@
       .cake-hero { font-size: 6.5rem; top: 100px; }
       .story-book { grid-template-columns: 1fr; }
       .story-page.left { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.12); }
+      .memory-nav { flex-direction: column; }
     }
   </style>
 </head>
@@ -706,7 +707,14 @@
             <div class="memory-status" id="memoryStatus">Pehli memory se shuruaat karo.</div>
           </div>
 
-          <div class="memory-grid" id="memoryGrid"></div>
+          <div class="memory-viewer empty" id="memoryViewer">
+            <div><strong>Memory 1</strong><br>Yeh slot abhi tumhari pehli photo ya video ka wait kar raha hai.</div>
+          </div>
+          <div class="memory-nav">
+            <button class="secondary-btn" id="prevMemoryBtn" onclick="changeMemorySlide(-1)">Previous</button>
+            <div class="memory-index" id="memorySlideIndex">No memory selected yet</div>
+            <button class="secondary-btn" id="nextMemoryBtn" onclick="changeMemorySlide(1)">Next</button>
+          </div>
         </div>
 
         <div class="timeline">
@@ -898,6 +906,7 @@
     let candlesLit = 0;
     let magicBalloonWords = [];
     let cakeCutDone = false;
+    let currentMemorySlide = 0;
     const maxMemories = 5;
     const memoryEntries = [];
     function nextStep(step) {
@@ -983,55 +992,83 @@
 
 
     function renderMemorySlots() {
-      const grid = document.getElementById('memoryGrid');
-      grid.innerHTML = '';
-
-      for (let i = 0; i < maxMemories; i++) {
-        const item = memoryEntries[i];
-        const card = document.createElement('div');
-        card.className = 'memory-card' + (item ? '' : ' empty');
-
-        if (item) {
-          const mediaWrap = document.createElement('div');
-          mediaWrap.className = 'memory-media';
-
-          if (item.type.startsWith('video/')) {
-            const video = document.createElement('video');
-            video.controls = true;
-            video.preload = 'metadata';
-            video.src = item.url;
-            mediaWrap.appendChild(video);
-          } else {
-            const img = document.createElement('img');
-            img.src = item.url;
-            img.alt = `memory ${i + 1}`;
-            mediaWrap.appendChild(img);
-          }
-
-          card.appendChild(mediaWrap);
-
-          const caption = document.createElement('div');
-          caption.className = 'memory-caption';
-          const heading = document.createElement('strong');
-          heading.innerText = `Memory ${i + 1}`;
-          const quoteText = document.createElement('span');
-          quoteText.innerText = item.quote;
-          caption.appendChild(heading);
-          caption.appendChild(quoteText);
-          card.appendChild(caption);
-        } else {
-          card.innerHTML = `<div><strong>Memory ${i + 1}</strong><br>Yeh slot abhi tumhari next photo ya video ka wait kar raha hai.</div>`;
-        }
-
-        grid.appendChild(card);
-      }
-
       document.getElementById('memoryProgress').innerText = `${memoryEntries.length} / ${maxMemories} memories added`;
       const done = memoryEntries.length === maxMemories;
       document.getElementById('memoryNextBtn').classList.toggle('hidden', !done);
       document.getElementById('addMemoryBtn').disabled = done;
       document.getElementById('addMemoryBtn').style.opacity = done ? '0.65' : '1';
       document.getElementById('addMemoryBtn').style.cursor = done ? 'not-allowed' : 'pointer';
+
+      if (memoryEntries.length > 0 && currentMemorySlide > memoryEntries.length - 1) {
+        currentMemorySlide = memoryEntries.length - 1;
+      }
+
+      renderCurrentMemory();
+    }
+
+    function renderCurrentMemory() {
+      const viewer = document.getElementById('memoryViewer');
+      const index = document.getElementById('memorySlideIndex');
+      const prevBtn = document.getElementById('prevMemoryBtn');
+      const nextBtn = document.getElementById('nextMemoryBtn');
+
+      viewer.innerHTML = '';
+
+      if (!memoryEntries.length) {
+        viewer.className = 'memory-viewer empty';
+        viewer.innerHTML = '<div><strong>Memory 1</strong><br>Yeh slot abhi tumhari pehli photo ya video ka wait kar raha hai.</div>';
+        index.innerText = 'No memory selected yet';
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+        prevBtn.style.opacity = '0.5';
+        nextBtn.style.opacity = '0.5';
+        return;
+      }
+
+      const item = memoryEntries[currentMemorySlide];
+      viewer.className = 'memory-viewer';
+
+      const mediaWrap = document.createElement('div');
+      mediaWrap.className = 'memory-media';
+
+      if (item.type.startsWith('video/')) {
+        const video = document.createElement('video');
+        video.controls = true;
+        video.preload = 'metadata';
+        video.src = item.url;
+        mediaWrap.appendChild(video);
+      } else {
+        const img = document.createElement('img');
+        img.src = item.url;
+        img.alt = `memory ${currentMemorySlide + 1}`;
+        mediaWrap.appendChild(img);
+      }
+
+      viewer.appendChild(mediaWrap);
+
+      const caption = document.createElement('div');
+      caption.className = 'memory-caption';
+      const heading = document.createElement('strong');
+      heading.innerText = `Memory ${currentMemorySlide + 1}`;
+      const quoteText = document.createElement('span');
+      quoteText.innerText = item.quote;
+      caption.appendChild(heading);
+      caption.appendChild(quoteText);
+      viewer.appendChild(caption);
+
+      index.innerText = `Showing ${currentMemorySlide + 1} of ${memoryEntries.length}`;
+      prevBtn.disabled = currentMemorySlide === 0;
+      nextBtn.disabled = currentMemorySlide === memoryEntries.length - 1;
+      prevBtn.style.opacity = prevBtn.disabled ? '0.5' : '1';
+      nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
+    }
+
+    function changeMemorySlide(direction) {
+      if (!memoryEntries.length) return;
+      const nextIndex = currentMemorySlide + direction;
+      if (nextIndex < 0 || nextIndex >= memoryEntries.length) return;
+      currentMemorySlide = nextIndex;
+      renderCurrentMemory();
     }
 
     function addMemoryItem() {
@@ -1074,6 +1111,7 @@
         url: mediaUrl,
         quote
       });
+      currentMemorySlide = memoryEntries.length - 1;
 
       urlInput.value = '';
       quoteInput.value = '';
@@ -1174,6 +1212,7 @@
       candlesLit = 0;
       magicBalloonWords = [];
       cakeCutDone = false;
+      currentMemorySlide = 0;
 
       memoryEntries.length = 0;
       document.getElementById('memoryUrlInput').value = '';
