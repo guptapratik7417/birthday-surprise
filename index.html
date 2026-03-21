@@ -322,7 +322,7 @@
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 22px;
       overflow: hidden;
-      min-height: 320px;
+      min-height: 520px;
       display: flex;
       flex-direction: column;
       margin-top: 4px;
@@ -338,12 +338,12 @@
 
     .memory-media {
       width: 100%;
-      min-height: 250px;
-      max-height: 420px;
+      min-height: 420px;
+      max-height: 70vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 14px;
+      padding: 18px;
       background: rgba(255,255,255,0.06);
     }
 
@@ -353,7 +353,7 @@
       width: auto;
       max-width: 100%;
       height: auto;
-      max-height: 52vh;
+      max-height: calc(70vh - 36px);
       object-fit: contain;
       background: rgba(255,255,255,0.08);
       border-radius: 16px;
@@ -389,6 +389,11 @@
     .memory-index {
       font-size: 0.96rem;
       color: rgba(255,255,255,0.82);
+    }
+
+    .memory-stage {
+      display: grid;
+      gap: 14px;
     }
 
     .timeline {
@@ -707,13 +712,15 @@
             <div class="memory-status" id="memoryStatus">Pehli memory se shuruaat karo.</div>
           </div>
 
-          <div class="memory-viewer empty" id="memoryViewer">
-            <div><strong>Memory 1</strong><br>Yeh slot abhi tumhari pehli photo ya video ka wait kar raha hai.</div>
-          </div>
-          <div class="memory-nav">
-            <button class="secondary-btn" id="prevMemoryBtn" onclick="changeMemorySlide(-1)">Previous</button>
-            <div class="memory-index" id="memorySlideIndex">No memory selected yet</div>
-            <button class="secondary-btn" id="nextMemoryBtn" onclick="changeMemorySlide(1)">Next</button>
+          <div class="memory-stage">
+            <div class="memory-viewer empty" id="memoryViewer">
+              <div><strong>Memory 1</strong><br>Yeh slot abhi tumhari pehli photo ya video ka wait kar raha hai.</div>
+            </div>
+            <div class="memory-nav">
+              <button class="secondary-btn" id="prevMemoryBtn" onclick="changeMemorySlide(-1)">Previous</button>
+              <div class="memory-index" id="memorySlideIndex">No memory selected yet</div>
+              <button class="secondary-btn" id="nextMemoryBtn" onclick="changeMemorySlide(1)">Next</button>
+            </div>
           </div>
         </div>
 
@@ -877,7 +884,7 @@
     // PERSONALIZE HERE
     // ==============================
     // Format: YYYY-MM-DDTHH:MM:SS
-    const targetDate = "2026-03-25T00:00:00";
+    const targetDate = "2026-03-24T00:00:00";
 
     const quizData = [
       {
@@ -1071,6 +1078,25 @@
       renderCurrentMemory();
     }
 
+    function normalizeMediaUrl(input) {
+      const trimmed = input.trim();
+      if (!trimmed) return null;
+
+      try {
+        const resolved = new URL(trimmed, window.location.href);
+        const hasExplicitScheme = /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(trimmed);
+        const encodedPath = resolved.pathname
+          .split('/')
+          .map(part => encodeURIComponent(decodeURIComponent(part)))
+          .join('/');
+        const normalized = `${encodedPath}${resolved.search}${resolved.hash}`;
+
+        return hasExplicitScheme ? `${resolved.origin}${normalized}` : normalized;
+      } catch (error) {
+        return null;
+      }
+    }
+
     function addMemoryItem() {
       if (memoryEntries.length >= maxMemories) return;
 
@@ -1090,14 +1116,13 @@
         return;
       }
 
-      try {
-        new URL(mediaUrl);
-      } catch (error) {
-        status.innerText = 'Valid URL paste karo. GitHub raw link best rahega.';
+      const normalizedMediaUrl = normalizeMediaUrl(mediaUrl);
+      if (!normalizedMediaUrl) {
+        status.innerText = 'Valid path ya URL paste karo. Relative path bhi chalega.';
         return;
       }
 
-      const normalizedUrl = mediaUrl.toLowerCase();
+      const normalizedUrl = normalizedMediaUrl.toLowerCase();
       const isVideo = /\.(mp4|webm|ogg|mov)(\?|#|$)/.test(normalizedUrl);
       const isImage = /\.(jpg|jpeg|png|gif|webp|avif|svg)(\?|#|$)/.test(normalizedUrl);
 
@@ -1108,7 +1133,7 @@
 
       memoryEntries.push({
         type: isVideo ? 'video/url' : 'image/url',
-        url: mediaUrl,
+        url: normalizedMediaUrl,
         quote
       });
       currentMemorySlide = memoryEntries.length - 1;
