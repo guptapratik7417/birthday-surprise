@@ -915,7 +915,19 @@
     let cakeCutDone = false;
     let currentMemorySlide = 0;
     const maxMemories = 5;
-    const memoryEntries = [];
+    const defaultMemoryEntries = [
+      {
+        type: 'image/url',
+        url: 'images/photo1.jpg',
+        quote: 'Bachpan ki ek pyari si memory.'
+      },
+      {
+        type: 'video/url',
+        url: 'images/WhatsApp Video 2026-03-22 at 00.25.31.mp4',
+        quote: 'Ye special video wali memory hamesha yaad rahegi.'
+      }
+    ];
+    const memoryEntries = [...defaultMemoryEntries];
     function nextStep(step) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(`screen${step}`).classList.add('active');
@@ -1240,9 +1252,10 @@
       currentMemorySlide = 0;
 
       memoryEntries.length = 0;
+      memoryEntries.push(...defaultMemoryEntries);
       document.getElementById('memoryUrlInput').value = '';
       document.getElementById('memoryQuoteInput').value = '';
-      document.getElementById('memoryStatus').innerText = 'Pehli memory se shuruaat karo.';
+      document.getElementById('memoryStatus').innerText = 'Default memories loaded hain. Aur add karna ho to next one paste karo.';
       renderMemorySlots();
 
       document.querySelectorAll('.balloon').forEach(b => b.classList.remove('popped'));
