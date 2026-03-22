@@ -90,13 +90,14 @@
     .container {
       position: relative;
       z-index: 2;
-      width: min(1100px, 92vw);
+      width: 100%;
       margin: 0 auto;
       padding: 24px 0 40px;
     }
 
     .screen {
       min-height: 100vh;
+      width: 100%;
       display: none;
       align-items: center;
       justify-content: center;
@@ -146,13 +147,15 @@
     }
 
     #screen3 {
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
       align-items: stretch;
       justify-content: stretch;
       padding: 0;
     }
 
     #screen3 .glass-card {
-      width: min(1400px, 100vw);
+      width: 100%;
       min-height: 100vh;
       border-radius: 0;
       padding: 36px 32px 44px;
