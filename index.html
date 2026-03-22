@@ -145,6 +145,22 @@
       box-shadow: var(--shadow);
     }
 
+    #screen3 {
+      align-items: stretch;
+      justify-content: stretch;
+      padding: 0;
+    }
+
+    #screen3 .glass-card {
+      width: min(1400px, 100vw);
+      min-height: 100vh;
+      border-radius: 0;
+      padding: 36px 32px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
     h1, h2, h3, p { margin-top: 0; }
 
     .title {
@@ -277,7 +293,9 @@
     .memory-builder {
       margin-top: 20px;
       display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
       gap: 18px;
+      align-items: stretch;
     }
 
     .memory-uploader {
@@ -394,6 +412,7 @@
     .memory-stage {
       display: grid;
       gap: 14px;
+      min-height: 0;
     }
 
     .timeline {
@@ -634,6 +653,7 @@
 
     @media (max-width: 900px) {
       .options { grid-template-columns: 1fr; }
+      .memory-builder { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 600px) {
@@ -645,6 +665,11 @@
       .story-book { grid-template-columns: 1fr; }
       .story-page.left { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.12); }
       .memory-nav { flex-direction: column; }
+      #screen3 .glass-card {
+        width: 100%;
+        min-height: 100vh;
+        padding: 24px 16px 36px;
+      }
     }
   </style>
 </head>
@@ -721,21 +746,6 @@
               <div class="memory-index" id="memorySlideIndex">No memory selected yet</div>
               <button class="secondary-btn" id="nextMemoryBtn" onclick="changeMemorySlide(1)">Next</button>
             </div>
-          </div>
-        </div>
-
-        <div class="timeline">
-          <div class="timeline-item">
-            <strong>From Small Moments 💫</strong>
-            Har chhoti baat, har hansi, har call… sab yaadgar bana diya tumne.
-          </div>
-          <div class="timeline-item">
-            <strong>To Bigger Memories 🌸</strong>
-            Saath mein bitaya hua time simple tha, but tumhari wajah se special ban gaya.
-          </div>
-          <div class="timeline-item">
-            <strong>And Now This Birthday 🎂</strong>
-            Pichhle birthdays ki yaadon ke baad, ab naye memories likhne ka time hai.
           </div>
         </div>
 
