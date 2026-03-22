@@ -161,7 +161,7 @@
       padding: 36px 32px 44px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
     }
 
     h1, h2, h3, p { margin-top: 0; }
@@ -296,19 +296,32 @@
     .memory-builder {
       margin-top: 20px;
       display: grid;
-      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
-      gap: 18px;
+      grid-template-columns: 1fr;
+      gap: 22px;
       align-items: stretch;
+      flex: 1;
     }
 
     .memory-uploader {
       display: grid;
+      grid-template-columns: minmax(220px, 260px) minmax(260px, 1fr) minmax(260px, 1fr);
+      align-items: end;
       gap: 14px;
       padding: 20px;
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.14);
       border-radius: 24px;
       text-align: left;
+    }
+
+    .memory-uploader .memory-progress,
+    .memory-uploader .memory-status {
+      grid-column: 1 / -1;
+    }
+
+    .memory-uploader .btn-row {
+      justify-content: flex-start !important;
+      margin-top: 0 !important;
     }
 
     .memory-uploader label {
@@ -343,7 +356,7 @@
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 22px;
       overflow: hidden;
-      min-height: 520px;
+      min-height: calc(100vh - 320px);
       display: flex;
       flex-direction: column;
       margin-top: 4px;
@@ -359,12 +372,12 @@
 
     .memory-media {
       width: 100%;
-      min-height: 420px;
-      max-height: 70vh;
+      min-height: calc(100vh - 430px);
+      max-height: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 18px;
+      padding: 24px;
       background: rgba(255,255,255,0.06);
     }
 
@@ -374,7 +387,7 @@
       width: auto;
       max-width: 100%;
       height: auto;
-      max-height: calc(70vh - 36px);
+      max-height: calc(100vh - 478px);
       object-fit: contain;
       background: rgba(255,255,255,0.08);
       border-radius: 16px;
@@ -416,6 +429,7 @@
       display: grid;
       gap: 14px;
       min-height: 0;
+      flex: 1;
     }
 
     .timeline {
@@ -656,7 +670,7 @@
 
     @media (max-width: 900px) {
       .options { grid-template-columns: 1fr; }
-      .memory-builder { grid-template-columns: 1fr; }
+      .memory-uploader { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 600px) {
@@ -672,6 +686,17 @@
         width: 100%;
         min-height: 100vh;
         padding: 24px 16px 36px;
+      }
+      .memory-viewer {
+        min-height: auto;
+      }
+      .memory-media {
+        min-height: 320px;
+        padding: 16px;
+      }
+      .memory-viewer img,
+      .memory-viewer video {
+        max-height: calc(100vh - 520px);
       }
     }
   </style>
