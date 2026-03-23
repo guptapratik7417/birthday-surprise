@@ -1409,36 +1409,4 @@
     <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1e8b.mp3" type="audio/mpeg">
   </audio>
 
-  <script>
-    const bgMusic = document.getElementById('bgMusic');
-    const clickSound = document.getElementById('clickSound');
-
-    function playMusic() {
-      if (bgMusic.paused) {
-        bgMusic.volume = 0.5;
-        bgMusic.play().catch(()=>{});
-      }
-    }
-
-    function playClick() {
-      clickSound.currentTime = 0;
-      clickSound.play();
-    }
-
-    // Modify existing nextStep to include music + sound
-    const originalNextStep = nextStep;
-    nextStep = function(step) {
-      playMusic();
-      playClick();
-      originalNextStep(step);
-    }
-
-    // Add sound to interactions
-    document.addEventListener('click', function(e) {
-      if (e.target.tagName === 'BUTTON' || e.target.classList.contains('balloon')) {
-        playClick();
-      }
-    });
-  </script>
-</body>
-</html>
+  <script
