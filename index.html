@@ -915,16 +915,6 @@
         </div>
       </div>
     </section>
-
-    <!-- Last Memory Section -->
-    <section id="last-memory" style="margin-top: 40px; text-align: center;">
-      <h2>Last Memory</h2>
-      <video width="480" controls poster="images/last-memory-poster.jpg">
-        <source src="images/WhatsApp Video 2026-03-22 at 18.32.36.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
-      <p style="margin-top: 10px; color: #888;">A special moment to remember.</p>
-    </section>
   </div>
 
   <script>
@@ -1074,6 +1064,11 @@
     function renderMemorySlots() {
       document.getElementById('memoryProgress').innerText = `${memoryEntries.length} / ${maxMemories} memories added`;
       const done = memoryEntries.length === maxMemories;
+      const uploader = document.getElementById('memoryUploader');
+
+      uploader.classList.toggle('hidden', done);
+      uploader.style.display = done ? 'none' : 'grid';
+
       document.getElementById('memoryNextBtn').classList.toggle('hidden', !done);
       document.getElementById('addMemoryBtn').disabled = done;
       document.getElementById('addMemoryBtn').style.opacity = done ? '0.65' : '1';
@@ -1152,23 +1147,35 @@
     }
 
     function normalizeMediaUrl(input) {
-      const trimmed = input.trim();
-      if (!trimmed) return null;
+  const trimmed = input.trim();
+  if (!trimmed) return null;
 
-      try {
-        const resolved = new URL(trimmed, window.location.href);
-        const hasExplicitScheme = /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(trimmed);
-        const encodedPath = resolved.pathname
-          .split('/')
-          .map(part => encodeURIComponent(decodeURIComponent(part)))
-          .join('/');
-        const normalized = `${encodedPath}${resolved.search}${resolved.hash}`;
+  const hasExplicitScheme = /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(trimmed);
+  const isProtocolRelative = trimmed.startsWith('//');
+  const isRootRelative = trimmed.startsWith('/');
+  const isRelativePath = !hasExplicitScheme && !isProtocolRelative && !isRootRelative;
 
-        return hasExplicitScheme ? `${resolved.origin}${normalized}` : normalized;
-      } catch (error) {
-        return null;
-      }
-    }
+  if (isRelativePath) {
+    return trimmed
+      .split('/')
+      .map(part => encodeURIComponent(decodeURIComponent(part)))
+      .join('/');
+  }
+
+  try {
+    const resolved = new URL(trimmed, window.location.href);
+    const encodedPath = resolved.pathname
+      .split('/')
+      .map(part => encodeURIComponent(decodeURIComponent(part)))
+      .join('/');
+    const normalized = `${encodedPath}${resolved.search}${resolved.hash}`;
+
+    return hasExplicitScheme ? `${resolved.origin}${normalized}` : normalized;
+  } catch (error) {
+    return null;
+  }
+}
+
 
     function addMemoryItem() {
       if (memoryEntries.length >= maxMemories) return;
@@ -1213,7 +1220,7 @@
 
       urlInput.value = '';
       quoteInput.value = '';
-      status.innerText = memoryEntries.length === maxMemories
+      status.innerText = memoryEntries.length >= maxMemories
         ? 'Perfect. Saari 5 memories ready hain.'
         : `Memory ${memoryEntries.length} save ho gayi. Ab next one add karo.`;
 
