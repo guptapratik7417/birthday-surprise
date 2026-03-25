@@ -441,6 +441,7 @@
     }
 
     #cake {
+      pointer-events: none;
       font-size: clamp(7rem, 15vw, 10rem);
       filter: drop-shadow(0 0 22px rgba(255,209,102,0.3));
       transition: transform .2s ease;
@@ -449,6 +450,7 @@
     #cakeWrap:hover #cake { transform: scale(1.05); }
 
     .candle-flame {
+      pointer-events: none;
       position: absolute;
       top: 12px;
       left: 50%;
@@ -789,7 +791,7 @@
         <h1 class="title">Tap to Light the Candle ✨</h1>
         <p class="subtitle">Pehle candle light karo, phir blow karke next birthday surprise kholo 💖</p>
 
-        <div id="cakeWrap" onclick="lightCandle()">
+        <div id="cakeWrap" onclick="handleCakeTap()">
           <div class="candle-flame">🔥</div>
           <div id="cake">🎂</div>
         </div>
@@ -919,6 +921,7 @@
     let currentScreen = 1;
     let currentQuizIndex = 0;
     let litDone = false;
+    let candleBlown = false;
     let candlesLit = 0;
     let magicBalloonWords = [];
     let cakeCutDone = false;
@@ -964,22 +967,22 @@
       {
         type: 'video/url',
         url: 'images/WhatsApp Video 2026-03-22 at 00.25.31.mp4',
-        quote: 'From that magical birthday in Manali where our story began, to today—every moment with you feels like a beautiful journey I never want to end. Happy birthday, my love ❤️🎂'
+        quote: 'From that magical birthday in Manali where our story began, to today every moment with you feels like a beautiful journey I never want to end. Happy birthday, my love.'
       },
       {
         type: 'image/url',
         url: 'images/WhatsApp Image 2026-03-22 at 00.19.55.jpeg',
-        quote: 'For your second birthday with me in Jaisalmer, under the golden skies and endless sands, our love felt even deeper—like a story beautifully unfolding with every moment. Happy birthday, my love 🌅❤️🎂'
+        quote: 'For your second birthday with me in Jaisalmer, under the golden skies and endless sands, our love felt even deeper like a story beautifully unfolding with every moment.'
       },
       {
-        type: 'image/url',
+        type: 'video/url',
         url: 'images/WhatsApp Video 2026-03-22 at 18.32.36.mp4',
-        quote: '“From celebrating your birthday twice—first with lights, cake, and laughter in Noida, to peaceful prayers and thrilling adventures in Rishikesh—every moment was a perfect mix of love, fun, and memories I’ll cherish forever. Happy birthday, my love ❤️🎂✨'
+        quote: 'From lights, cake, and laughter in Noida to peaceful prayers and thrilling adventures in Rishikesh, every moment was a perfect mix of love, fun, and memories.'
       },
       {
         type: 'video/url',
         url: 'WhatsApp Video 2026-03-23 at 01.43.41.mp4',
-        quote: 'From watching Apna Bana Le Mujhe Balma together, to dancing the night away at the club, cutting cakes again in Manesar, and ending the day with blessings at Khatu Shyam—your fifth birthday was a beautiful journey of love, joy, and faith I’ll always treasure. Happy birthday, my love ❤️🎂✨'
+        quote: 'From dancing the night away to ending the day with blessings at Khatu Shyam, your fifth birthday was a beautiful journey of love, joy, and faith I will always treasure.'
       }
     ].map(entry => ({
       ...entry,
@@ -1202,11 +1205,24 @@
       renderMemorySlots();
     }
 
+    function handleCakeTap() {
+      if (!litDone) {
+        lightCandle();
+        return;
+      }
+
+      if (!candleBlown) {
+        blowCandle();
+      }
+    }
+
     function lightCandle() {
       if (litDone) return;
       litDone = true;
+      candleBlown = false;
       playMusic();
       playClick();
+      document.getElementById('cakeWrap').classList.remove('blown');
       document.getElementById('cakeWrap').classList.add('lit');
       document.getElementById('cakeNote').innerText = 'Candle jal gayi... ab ek wish maango aur blow karo 💫';
       document.getElementById('blowBtn').classList.remove('hidden');
@@ -1214,9 +1230,11 @@
     }
 
     function blowCandle() {
+      if (!litDone || candleBlown) return;
+      candleBlown = true;
+      const cakeWrap = document.getElementById('cakeWrap');
       playMusic();
       playClick();
-      const cakeWrap = document.getElementById('cakeWrap');
       cakeWrap.classList.add('blown');
       document.getElementById('cakeNote').innerText = 'Yayyy... candle blow ho gayi! Ab next surprise kholo 🎉';
       document.getElementById('cakeNextBtn').classList.remove('hidden');
@@ -1289,6 +1307,7 @@
     function replaySurprise() {
       currentQuizIndex = 0;
       litDone = false;
+      candleBlown = false;
       candlesLit = 0;
       magicBalloonWords = [];
       cakeCutDone = false;
@@ -1382,7 +1401,7 @@
     createHearts();
   </script>
 
-  <audio id="bgMusic" loop>
+  <audio id="bgMusic" loop preload="auto">
     <source src="your-music.mp3" type="audio/mpeg">
   </audio>
 
@@ -1395,13 +1414,15 @@
     const clickSound = document.getElementById('clickSound');
 
     function playMusic() {
+      if (!bgMusic) return;
+      bgMusic.volume = 0.5;
       if (bgMusic.paused) {
-        bgMusic.volume = 0.5;
         bgMusic.play().catch(() => {});
       }
     }
 
     function playClick() {
+      if (!clickSound) return;
       clickSound.currentTime = 0;
       clickSound.play().catch(() => {});
     }
