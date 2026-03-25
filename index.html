@@ -372,8 +372,7 @@
 
     .memory-media {
       width: 100%;
-      min-height: calc(100vh - 430px);
-      max-height: none;
+      min-height: min(72vh, 720px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -384,10 +383,9 @@
     .memory-viewer img,
     .memory-viewer video {
       display: block;
-      width: auto;
+      width: 100%;
       max-width: 100%;
-      height: auto;
-      max-height: calc(100vh - 478px);
+      height: min(68vh, 640px);
       object-fit: contain;
       background: rgba(255,255,255,0.08);
       border-radius: 16px;
@@ -430,27 +428,6 @@
       gap: 14px;
       min-height: 0;
       flex: 1;
-    }
-
-    .timeline {
-      width: min(900px, 100%);
-      margin-top: 18px;
-      display: grid;
-      gap: 14px;
-      text-align: left;
-    }
-
-    .timeline-item {
-      background: rgba(255,255,255,0.08);
-      border-left: 4px solid var(--pink);
-      border-radius: 16px;
-      padding: 14px 16px;
-    }
-
-    .timeline-item strong {
-      color: var(--gold);
-      display: block;
-      margin-bottom: 6px;
     }
 
     #cakeWrap {
@@ -530,6 +507,13 @@
     }
 
     .quote-box {
+      margin-top: 20px;
+      background: rgba(255,255,255,0.09);
+      border-radius: 22px;
+      padding: 22px;
+      border: 1px solid rgba(255,255,255,0.14);
+      line-height: 1.8;
+      font-size: 1.1rem;
       transition: all .35s ease;
     }
 
@@ -637,16 +621,6 @@
       color: rgba(255,255,255,0.72);
     }
 
-    .quote-box {
-      margin-top: 20px;
-      background: rgba(255,255,255,0.09);
-      border-radius: 22px;
-      padding: 22px;
-      border: 1px solid rgba(255,255,255,0.14);
-      line-height: 1.8;
-      font-size: 1.1rem;
-    }
-
     .final-message {
       font-size: clamp(1rem, 2vw, 1.15rem);
       line-height: 1.9;
@@ -696,7 +670,7 @@
       }
       .memory-viewer img,
       .memory-viewer video {
-        max-height: calc(100vh - 520px);
+        height: min(52vh, 420px);
       }
     }
   </style>
@@ -896,17 +870,17 @@
         <h1 class="title glow">Happy Birthday, <span class="name-highlight">Cutiepie</span> 🥳💖</h1>
         <p class="final-message">
           Tum meri life ki sabse soft, pyari aur beautiful feeling ho. Tumhare saath har moment thoda aur warm, thoda aur bright, aur bahut zyada special lagta hai. 💖<br><br>
-          Aaj ke din bas itna kehna hai — tum hamesha haste raho, khush raho, aur duniya tumhe utna hi pyaar de jitna tum deserve karti ho... ya usse bhi zyada. ✨
+          Aaj ke din bas itna kehna hai - tum hamesha haste raho, khush raho, aur duniya tumhe utna hi pyaar de jitna tum deserve karti ho... ya usse bhi zyada. ✨
         </p>
 
         <div class="quote-box">
           <b>Love quote for you 💌</b><br><br>
-          “You are the calm in my chaos, the smile in my ordinary days, and the most beautiful part of my heart.”<br><br>
-          “If I could gift you one thing, I would gift you the ability to see yourself through my eyes — then you’d know how incredibly lovable and precious you are.”
+          "You are the calm in my chaos, the smile in my ordinary days, and the most beautiful part of my heart."<br><br>
+          "If I could gift you one thing, I would gift you the ability to see yourself through my eyes - then you'd know how incredibly lovable and precious you are."
         </div>
 
         <div class="quote-box" style="margin-top:14px;">
-          No matter how many birthdays come and go, one thing will always stay the same —
+          No matter how many birthdays come and go, one thing will always stay the same -
           <b>you will always be one of the most special parts of my world.</b> 🌸
         </div>
 
@@ -918,10 +892,6 @@
   </div>
 
   <script>
-    // ==============================
-    // PERSONALIZE HERE
-    // ==============================
-    // Format: YYYY-MM-DDTHH:MM:SS
     const targetDate = "2026-03-24T00:00:00";
 
     const quizData = [
@@ -953,6 +923,37 @@
     let cakeCutDone = false;
     let currentMemorySlide = 0;
     const maxMemories = 5;
+
+    function normalizeMediaUrl(input) {
+      const trimmed = input.trim();
+      if (!trimmed) return null;
+
+      const hasExplicitScheme = /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(trimmed);
+      const isProtocolRelative = trimmed.startsWith('//');
+      const isRootRelative = trimmed.startsWith('/');
+      const isRelativePath = !hasExplicitScheme && !isProtocolRelative && !isRootRelative;
+
+      if (isRelativePath) {
+        return trimmed
+          .split('/')
+          .map(part => encodeURIComponent(decodeURIComponent(part)))
+          .join('/');
+      }
+
+      try {
+        const resolved = new URL(trimmed, window.location.href);
+        const encodedPath = resolved.pathname
+          .split('/')
+          .map(part => encodeURIComponent(decodeURIComponent(part)))
+          .join('/');
+        const normalized = `${encodedPath}${resolved.search}${resolved.hash}`;
+
+        return hasExplicitScheme ? `${resolved.origin}${normalized}` : normalized;
+      } catch (error) {
+        return null;
+      }
+    }
+
     const defaultMemoryEntries = [
       {
         type: 'image/url',
@@ -970,20 +971,22 @@
         quote: 'Ye teesri memory bhi mere liye bahut special hai.'
       },
       {
-        type: 'video/url',
-        url: 'images/WhatsApp Video 2026-03-22 at 18.32.36.mp4',
+        type: 'image/url',
+        url: 'images/photo4.jpg',
         quote: 'Ye chauthi memory bhi bahut special hai.'
       },
       {
         type: 'video/url',
-        url: 'images/WhatsApp Video 2026-03-23 at 01.43.41.mp4',
+        url: 'images/WhatsApp Video 2026-03-22 at 18.32.36.mp4',
         quote: 'Ye last memory sabse zyada special hai.'
       }
     ].map(entry => ({
       ...entry,
       url: normalizeMediaUrl(entry.url)
     }));
+
     const memoryEntries = [...defaultMemoryEntries];
+
     function nextStep(step) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(`screen${step}`).classList.add('active');
@@ -993,7 +996,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Countdown
     function updateCountdown() {
       const target = new Date(targetDate).getTime();
       const now = new Date().getTime();
@@ -1021,7 +1023,6 @@
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    // Quiz
     function renderQuiz() {
       const q = quizData[currentQuizIndex];
       document.getElementById('questionText').innerText = q.question;
@@ -1065,10 +1066,9 @@
       renderQuiz();
     }
 
-
     function renderMemorySlots() {
       document.getElementById('memoryProgress').innerText = `${memoryEntries.length} / ${maxMemories} memories added`;
-      const done = memoryEntries.length === maxMemories;
+      const done = memoryEntries.length >= maxMemories;
       const uploader = document.getElementById('memoryUploader');
 
       uploader.classList.toggle('hidden', done);
@@ -1151,37 +1151,6 @@
       renderCurrentMemory();
     }
 
-    function normalizeMediaUrl(input) {
-  const trimmed = input.trim();
-  if (!trimmed) return null;
-
-  const hasExplicitScheme = /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(trimmed);
-  const isProtocolRelative = trimmed.startsWith('//');
-  const isRootRelative = trimmed.startsWith('/');
-  const isRelativePath = !hasExplicitScheme && !isProtocolRelative && !isRootRelative;
-
-  if (isRelativePath) {
-    return trimmed
-      .split('/')
-      .map(part => encodeURIComponent(decodeURIComponent(part)))
-      .join('/');
-  }
-
-  try {
-    const resolved = new URL(trimmed, window.location.href);
-    const encodedPath = resolved.pathname
-      .split('/')
-      .map(part => encodeURIComponent(decodeURIComponent(part)))
-      .join('/');
-    const normalized = `${encodedPath}${resolved.search}${resolved.hash}`;
-
-    return hasExplicitScheme ? `${resolved.origin}${normalized}` : normalized;
-  } catch (error) {
-    return null;
-  }
-}
-
-
     function addMemoryItem() {
       if (memoryEntries.length >= maxMemories) return;
 
@@ -1232,7 +1201,6 @@
       renderMemorySlots();
     }
 
-    // Cake
     function lightCandle() {
       if (litDone) return;
       litDone = true;
@@ -1262,7 +1230,6 @@
       setTimeout(() => nextStep(4), 1800);
     }
 
-    // Balloons
     function lightSingleCandle(el) {
       if (el.classList.contains('lit-candle')) return;
       playMusic();
@@ -1326,6 +1293,7 @@
 
       memoryEntries.length = 0;
       memoryEntries.push(...defaultMemoryEntries);
+
       document.getElementById('memoryUrlInput').value = '';
       document.getElementById('memoryQuoteInput').value = '';
       document.getElementById('memoryStatus').innerText = 'Default memories loaded hain. Aur add karna ho to next one paste karo.';
@@ -1361,7 +1329,6 @@
       nextStep(1);
     }
 
-    // Effects
     function createStars() {
       const stars = document.getElementById('stars');
       for (let i = 0; i < 90; i++) {
@@ -1411,14 +1378,43 @@
     createStars();
     createHearts();
   </script>
-  <!-- Background Music -->
+
   <audio id="bgMusic" loop>
     <source src="your-music.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- Sound Effects -->
   <audio id="clickSound">
     <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9b1e8b.mp3" type="audio/mpeg">
   </audio>
 
-  <script
+  <script>
+    const bgMusic = document.getElementById('bgMusic');
+    const clickSound = document.getElementById('clickSound');
+
+    function playMusic() {
+      if (bgMusic.paused) {
+        bgMusic.volume = 0.5;
+        bgMusic.play().catch(() => {});
+      }
+    }
+
+    function playClick() {
+      clickSound.currentTime = 0;
+      clickSound.play().catch(() => {});
+    }
+
+    const originalNextStep = nextStep;
+    nextStep = function(step) {
+      playMusic();
+      playClick();
+      originalNextStep(step);
+    };
+
+    document.addEventListener('click', function(e) {
+      if (e.target.tagName === 'BUTTON' || e.target.classList.contains('balloon')) {
+        playClick();
+      }
+    });
+  </script>
+</body>
+</html>
