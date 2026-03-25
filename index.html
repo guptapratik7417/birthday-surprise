@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Birthday Surprise Deluxe</title>
+  <link rel="icon" type="image/png" href="images/logo.png">
+  <link rel="apple-touch-icon" href="images/logo.png">
   <style>
     :root {
       --bg1: #120c1c;
@@ -1205,6 +1207,7 @@
       if (litDone) return;
       litDone = true;
       playMusic();
+      playClick();
       document.getElementById('cakeWrap').classList.add('lit');
       document.getElementById('cakeNote').innerText = 'Candle jal gayi... ab ek wish maango aur blow karo 💫';
       document.getElementById('blowBtn').classList.remove('hidden');
@@ -1223,6 +1226,7 @@
 
     function activateGlowMoment() {
       playMusic();
+      playClick();
       document.body.classList.add('bright-mode');
       document.getElementById('lightMomentCard').classList.add('glow-up');
       document.getElementById('glowNote').innerText = 'Look... everything is glowing brighter for you ✨';
@@ -1411,7 +1415,17 @@
     };
 
     document.addEventListener('click', function(e) {
-      if (e.target.tagName === 'BUTTON' || e.target.classList.contains('balloon')) {
+      const clickable =
+        e.target.tagName === 'BUTTON' ||
+        e.target.classList.contains('balloon') ||
+        e.target.classList.contains('candle-item') ||
+        e.target.id === 'cakeWrap' ||
+        e.target.id === 'cake' ||
+        e.target.id === 'knife' ||
+        e.target.id === 'bigCake';
+
+      if (clickable) {
+        playMusic();
         playClick();
       }
     });
