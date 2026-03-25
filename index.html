@@ -644,6 +644,63 @@
       opacity: 0.8;
     }
 
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      background: rgba(10, 6, 20, 0.86);
+      backdrop-filter: blur(12px);
+    }
+
+    .login-card {
+      width: min(420px, 100%);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 26px;
+      padding: 28px 22px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .login-card h2 {
+      margin-bottom: 10px;
+    }
+
+    .login-card p {
+      color: rgba(255,255,255,0.82);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .login-form {
+      display: grid;
+      gap: 12px;
+    }
+
+    .login-form input {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.1);
+      color: var(--white);
+      border-radius: 16px;
+      padding: 14px 16px;
+      font: inherit;
+    }
+
+    .login-form input::placeholder {
+      color: rgba(255,255,255,0.58);
+    }
+
+    .login-error {
+      min-height: 24px;
+      color: #ffd166;
+      font-size: 0.95rem;
+    }
+
     .hidden { display: none !important; }
 
     @media (max-width: 900px) {
@@ -680,6 +737,19 @@
   </style>
 </head>
 <body>
+  <div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+      <h2 class="glow">Private Birthday Surprise</h2>
+      <p>Username aur password daal kar surprise kholo.</p>
+      <div class="login-form">
+        <input id="usernameInput" type="text" placeholder="Enter username" autocomplete="username">
+        <input id="passwordInput" type="password" placeholder="Enter password" autocomplete="current-password">
+        <button class="primary-btn" onclick="checkLogin()">Unlock Surprise</button>
+        <div id="loginError" class="login-error"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="stars" id="stars"></div>
   <div class="hearts" id="hearts"></div>
   <div class="confetti" id="confetti"></div>
@@ -895,6 +965,8 @@
   </div>
 
   <script>
+    const accessUsername = "shinchan";
+    const accessPassword = "birthday123";
     const targetDate = "2026-03-24T00:00:00";
 
     const quizData = [
@@ -990,6 +1062,27 @@
     }));
 
     const memoryEntries = [...defaultMemoryEntries];
+
+    function checkLogin() {
+      const username = document.getElementById('usernameInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
+      const error = document.getElementById('loginError');
+
+      if (username === accessUsername && password === accessPassword) {
+        document.getElementById('loginOverlay').classList.add('hidden');
+        document.body.style.overflowY = 'auto';
+        playMusic();
+        return;
+      }
+
+      error.innerText = 'Wrong username ya password. Try again.';
+    }
+
+    function handleLoginKeydown(event) {
+      if (event.key === 'Enter') {
+        checkLogin();
+      }
+    }
 
     function nextStep(step) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1434,7 +1527,13 @@
       originalNextStep(step);
     };
 
+    document.getElementById('usernameInput').addEventListener('keydown', handleLoginKeydown);
+    document.getElementById('passwordInput').addEventListener('keydown', handleLoginKeydown);
+    document.body.style.overflow = 'hidden';
+
     document.addEventListener('click', function(e) {
+      const loginLocked = !document.getElementById('loginOverlay').classList.contains('hidden');
+
       const clickable =
         e.target.tagName === 'BUTTON' ||
         e.target.classList.contains('balloon') ||
@@ -1444,9 +1543,12 @@
         e.target.id === 'knife' ||
         e.target.id === 'bigCake';
 
-      if (clickable) {
+      if (!clickable) return;
+
+      playClick();
+
+      if (!loginLocked) {
         playMusic();
-        playClick();
       }
     });
   </script>
